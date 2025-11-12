@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>블로그 - HomeSweet Massage Studio</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="index.html" aria-label="HomeSweet Massage Studio">
+        <span class="brand-text">HomeSweet</span>
+        <small class="brand-sub">Massage Studio</small>
+      </a>
+      <button class="nav-toggle" aria-expanded="false" aria-controls="main-nav" aria-label="메뉴 열기"><span class="hamburger"></span></button>
+      <nav id="main-nav" class="nav" aria-label="주요 내비게이션">
+        <ul class="nav-menu">
+          <li><a href="index.html" class="nav-link">홈</a></li>
+          <li><a href="about.html" class="nav-link">소개</a></li>
+          <li><a href="regions.html" class="nav-link">지역선택</a></li>
+          <li><a href="blog.html" class="nav-link active">블로그</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container main-content">
+    <section class="about-hero">
+      <div class="hero-image" style="background-image:url('Blog.jpg');"></div>
+      <div class="hero-text">
+        <h1>블로그</h1>
+        <p class="lead">마사지 팁, 지역별 서비스, 고객 후기 등 유용한 정보를 제공합니다.</p>
+      </div>
+    </section>
+
+    <section id="blogArea" class="posts">
+      <!-- JS 将根据 URL 参数渲染列表或单篇 -->
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <strong>HomeSweet Massage Studio</strong>
+        <p class="muted">집에서 누리는 프리미엄 마사지</p>
+      </div>
+      <nav class="footer-nav" aria-label="푸터 내비게이션">
+        <a href="index.html">홈</a>
+        <a href="about.html">소개</a>
+        <a href="regions.html">지역선택</a>
+        <a href="blog.html">블로그</a>
+      </nav>
+      <div class="footer-meta">
+        <p>© <span id="year"></span> HomeSweet Massage Studio. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+<script>
+document.getElementById('year').textContent = new Date().getFullYear();
+
+/* sample blogData：可以替换或扩展 */
+const blogData = {
+  "서울특별시": {
+    "강남구": [
+      { id: 'seoul_gangnam_1', title: '강남구 최고의 출장 마사지 팁', excerpt: '집에서도 편하게 받을 수 있는 준비와 주의사항', content: '<p>강남 지역에서 인기 있는 서비스 소개...</p>' }
+    ],
+    "종로구": [
+      { id: 'seoul_jongro_1', title: '종로구 고객 후기', excerpt:'고령 고객 대상 맞춤 서비스 후기', content: '<p>종로구 관련 상세 후기...</p>' }
+    ]
+  },
+  "부산광역시": {
+    "해운대구": [
+      { id: 'busan_haeundae_1', title: '해운대에서의 휴식', excerpt:'해운대 출장 서비스 특징', content: '<p>해운대 지역 설명...</p>' }
+    ]
+  }
+};
+
+function qs(name){
+  return new URLSearchParams(location.search).get(name);
+}
+
+function renderList(province, district){
+  const container = document.getElementById('blogArea');
+  container.innerHTML = `<h2 class="section-title">${province} > ${district} 게시물</h2>`;
+  const posts = (blogData[province] && blogData[province][district]) || [];
+  if (!posts.length) {
+    container.innerHTML += `<p class="blog-no-posts">해당 지역에 게시물이 없습니다. 다른 지역을 확인하세요.</p>`;
+    return;
+  }
+  const list = document.createElement('div');
+  list.className = 'cards';
+  posts.forEach(p => {
+    const card = document.createElement('article');
+    card.className = 'post-card';
+    card.innerHTML = `<h3>${p.title}</h3><p class="excerpt">${p.excerpt}</p><a class="btn" href="#${p.id}">읽어보기</a>`;
+    list.appendChild(card);
+  });
+  container.appendChild(list);
+}
+
+function renderAll(){
+  const container = document.getElementById('blogArea');
+  container.innerHTML = `<h2 class="section-title">최신 게시물</h2><p class="section-intro">지역을 선택하거나 최신 글을 확인하세요.</p>`;
+  const list = document.createElement('div');
+  list.className = 'cards';
+  for (const prov in blogData) {
+    for (const dist in blogData[prov]) {
+      blogData[prov][dist].forEach(p => {
+        const card = document.createElement('article');
+        card.className = 'post-card';
+        card.innerHTML = `<h3>${p.title}</h3><p class="excerpt">${p.excerpt} (${prov} > ${dist})</p><a class="btn" href="blog.html?province=${encodeURIComponent(prov)}&district=${encodeURIComponent(dist)}">지역별 보기</a>`;
+        list.appendChild(card);
+      });
+    }
+  }
+  container.appendChild(list);
+}
+
+/* 路由：根据 URL 参数显示 */
+const prov = qs('province'), dist = qs('district');
+if (prov && dist) renderList(prov, dist);
+else renderAll();
+
+/* 移动端导航切换 */
+(function(){
+  const btn = document.querySelector('.nav-toggle');
+  const nav = document.getElementById('main-nav');
+  btn && btn.addEventListener('click', () => {
+    const expanded = btn.getAttribute('aria-expanded') === 'true';
+    btn.setAttribute('aria-expanded', String(!expanded));
+    nav.classList.toggle('open');
+  });
+})();
+</script>
+
+</body>
+</html>
