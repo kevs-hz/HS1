@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>지역선택 - HomeSweet Massage Studio</title>
+  <link rel="stylesheet" href="style.css" />
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const mainMenu = document.querySelector(".main-region");
+      const subMenu = document.querySelector(".sub-region");
+      const detailMenu = document.querySelector(".detail-region");
+
+      const data = {
+        "도": {
+          "경기도": ["수원", "성남", "용인", "의정부"],
+          "강원도": ["춘천", "강릉", "원주"]
+        },
+        "특별시": {
+          "서울특별시": ["강남", "종로", "마포", "송파"]
+        },
+        "광역시": {
+          "부산광역시": ["해운대", "남포", "서면"],
+          "대구광역시": ["수성구", "달서구"]
+        }
+      };
+
+      mainMenu.onmouseover = () => {
+        subMenu.classList.add("show");
+      };
+
+      subMenu.onmouseleave = () => {
+        subMenu.classList.remove("show");
+        detailMenu.classList.remove("show");
+      };
+
+      subMenu.innerHTML = Object.keys(data)
+        .map(key => `<li data-type="${key}">${key}</li>`)
+        .join("");
+
+      subMenu.addEventListener("mouseover", e => {
+        if (e.target.dataset.type) {
+          const type = e.target.dataset.type;
+          const cities = Object.keys(data[type]);
+          detailMenu.classList.add("show");
+          detailMenu.innerHTML = cities
+            .map(c => `<li>${c}<ul>${data[type][c].map(d => `<li>${d}</li>`).join("")}</ul></li>`)
+            .join("");
+        }
+      });
+    });
+  </script>
+</head>
+<body>
+
+<header>
+  <div class="logo">HomeSweet Massage Studio</div>
+  <nav>
+    <ul>
+      <li><a href="index.html">홈</a></li>
+      <li><a href="about.html">소개</a></li>
+      <li><a href="regions.html" class="active">지역선택</a></li>
+      <li><a href="blog.html">블로그</a></li>
+    </ul>
+  </nav>
+</header>
+
+<section class="regions">
+  <img src="Region.jpg" alt="지역 이미지" />
+  <h2>지역을 선택하세요</h2>
+  <div class="region-menu">
+    <div class="main-region">도 / 특별시 / 광역시 선택</div>
+    <ul class="sub-region"></ul>
+    <ul class="detail-region"></ul>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-container">
+    <div class="footer-logo">HomeSweet Massage Studio</div>
+    <ul class="footer-nav">
+      <li><a href="index.html">홈</a></li>
+      <li><a href="about.html">소개</a></li>
+      <li><a href="regions.html">지역선택</a></li>
+      <li><a href="blog.html">블로그</a></li>
+    </ul>
+    <p class="footer-copy">© 2025 HomeSweet Massage Studio. All rights reserved.</p>
+  </div>
+</footer>
+
+</body>
+</html>
