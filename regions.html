@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>지역선택 - HomeSweet Massage Studio</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="index.html" aria-label="HomeSweet Massage Studio">
+        <span class="brand-text">HomeSweet</span>
+        <small class="brand-sub">Massage Studio</small>
+      </a>
+      <button class="nav-toggle" aria-expanded="false" aria-controls="main-nav" aria-label="메뉴 열기">
+        <span class="hamburger"></span>
+      </button>
+      <nav id="main-nav" class="nav" aria-label="주요 내비게이션">
+        <ul class="nav-menu">
+          <li><a href="index.html" class="nav-link">홈</a></li>
+          <li><a href="about.html" class="nav-link">소개</a></li>
+          <li class="nav-item dropdown active" data-dropdown="regions">
+            <a href="regions.html" class="nav-link" aria-haspopup="true" aria-expanded="true">지역선택 ▾</a>
+          </li>
+          <li><a href="blog.html" class="nav-link">블로그</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container main-content">
+    <section class="region-selection-section">
+      <div class="region-selector-wrapper">
+        <h1>지역을 선택해주세요</h1>
+        <p class="lead">도 / 특별시 / 광역시 → 시/도 → 구/군 순으로 선택하시면 해당 지역의 게시물과 서비스를 확인할 수 있습니다.</p>
+
+        <form id="regionForm" class="region-form" onsubmit="return false;">
+          <div class="form-row">
+            <label for="regionType">구분 (도 / 특별시 / 광역시)</label>
+            <select id="regionType" required>
+              <option value="">선택하세요</option>
+              <option value="do">도</option>
+              <option value="teukbyeolsi">특별시</option>
+              <option value="gwangyeoksi">광역시</option>
+            </select>
+          </div>
+
+          <div class="form-row">
+            <label for="province">시/도</label>
+            <select id="province" disabled required>
+              <option value="">먼저 구분을 선택하세요</option>
+            </select>
+          </div>
+
+          <div class="form-row">
+            <label for="district">구/군</label>
+            <select id="district" disabled required>
+              <option value="">먼저 시/도를 선택하세요</option>
+            </select>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" id="viewBlogBtn" class="btn primary" disabled>선택한 지역의 블로그 보기</button>
+          </div>
+        </form>
+
+        <div id="selectedRegion" class="selected-region-display"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <strong>HomeSweet Massage Studio</strong>
+        <p class="muted">집에서 누리는 프리미엄 마사지</p>
+      </div>
+      <nav class="footer-nav" aria-label="푸터 내비게이션">
+        <a href="index.html">홈</a>
+        <a href="about.html">소개</a>
+        <a href="regions.html">지역선택</a>
+        <a href="blog.html">블로그</a>
+      </nav>
+      <div class="footer-meta">
+        <p>© <span id="year"></span> HomeSweet Massage Studio. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+<script>
+document.getElementById('year').textContent = new Date().getFullYear();
+
+/* regionData：可按需补全（当前包含常用示例，若你希望我直接把你原始完整列表写入，此处可以替换） */
+const regionData = {
+  "do": {
+    "경기도": ["수원","성남","용인","의정부","고양","부천","안산","안양"],
+    "강원도": ["춘천","강릉","원주","동해","속초"]
+  },
+  "teukbyeolsi": {
+    "서울특별시": ["강남구","종로구","마포구","송파구","서초구","영등포구","강서구","관악구"]
+  },
+  "gwangyeoksi": {
+    "부산광역시": ["해운대구","남구","서면","동래구"],
+    "대구광역시": ["수성구","달서구","중구"],
+    "인천광역시": ["연수구","남동구","부평구"]
+  }
+};
+
+const $type = document.getElementById('regionType');
+const $province = document.getElementById('province');
+const $district = document.getElementById('district');
+const $viewBtn = document.getElementById('viewBlogBtn');
+const $selected = document.getElementById('selectedRegion');
+
+function resetSelect(sel, placeholder){
+  sel.innerHTML = `<option value="">${placeholder}</option>`;
+  sel.disabled = true;
+}
+
+function fillSelect(sel, items, placeholder){
+  sel.innerHTML = `<option value="">${placeholder}</option>` + items.map(i => `<option value="${i}">${i}</option>`).join('');
+  sel.disabled = false;
+}
+
+$type.addEventListener('change', () => {
+  const v = $type.value;
+  if (!v || !regionData[v]) { resetSelect($province, '먼저 구분을 선택하세요'); resetSelect($district, '먼저 시/도를 선택하세요'); $viewBtn.disabled=true; return; }
+  fillSelect($province, Object.keys(regionData[v]), '시/도를 선택하세요');
+  resetSelect($district, '먼저 시/도를 선택하세요');
+  $viewBtn.disabled = true;
+});
+
+$province.addEventListener('change', () => {
+  const t = $type.value, p = $province.value;
+  if (!p || !regionData[t] || !regionData[t][p]) { resetSelect($district,'먼저 시/도를 선택하세요'); $viewBtn.disabled=true; return; }
+  fillSelect($district, regionData[t][p], '구/군을 선택하세요');
+  $viewBtn.disabled = true;
+});
+
+$district.addEventListener('change', () => {
+  $viewBtn.disabled = !$district.value;
+  if ($district.value) {
+    $selected.innerHTML = `<div class="region-card"><div class="region-text">${$province.value} > ${$district.value}</div><div class="region-desc">선택한 지역의 서비스와 블로그 게시물을 확인하려면 아래 버튼을 클릭하세요.</div></div>`;
+  } else $selected.innerHTML = '';
+});
+
+$viewBtn.addEventListener('click', () => {
+  const prov = encodeURIComponent($province.value);
+  const dist = encodeURIComponent($district.value);
+  location.href = `blog.html?province=${prov}&district=${dist}`;
+});
+
+/* 移动端导航切换 */
+(function(){
+  const btn = document.querySelector('.nav-toggle');
+  const nav = document.getElementById('main-nav');
+  btn && btn.addEventListener('click', () => {
+    const expanded = btn.getAttribute('aria-expanded') === 'true';
+    btn.setAttribute('aria-expanded', String(!expanded));
+    nav.classList.toggle('open');
+  });
+})();
+</script>
+
+</body>
+</html>
